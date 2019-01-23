@@ -7,9 +7,11 @@ from items import ZhihuItem
 
 class ZhihuSpider(scrapy.Spider):
     name = 'zhihu'
+    star_user = 'kaifulee'
     allowed_domains = ['www.zhihu.com']
     start_urls = ['https://www.zhihu.com/api/v4/members/kaifulee/followers?include=data%5B*%5D.answer_count%2Carticles'+ \
                   '_count%2Cgender%2Cfollower_count%2Cis_followed%2Cis_following%2Cbadge%5B%3F(type%3Dbest_answerer)%5D.topics&offset=20&limit=20']
+
 
     def parse(self, response):
         result = json.loads(response.text)

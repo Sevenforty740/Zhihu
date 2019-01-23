@@ -7,6 +7,9 @@
 import random
 from .useragents import *
 from scrapy import signals
+import pymysql
+from proxies import PROXIES
+
 
 
 
@@ -107,3 +110,21 @@ class ZhihuDownloaderMiddleware(object):
 class RandomUserAgent():
     def process_request(self,request,spider):
         request.headers['User-Agent'] = random.choice(UA)
+
+class RandomProxy():
+    conn = pymysql.connect(host="localhost", user="root",
+                           password="123456", db="proxy", port=3306)
+    cursor = conn.cursor()
+
+
+    def process_request(self,request,spider):
+        self.cursor.execute('SELECT * FROM available WHERE ID >= ((SELECT MAX(ID) FROM available)-(SELECT MIN(ID) FROM '
+                            'available)) * RAND() + (SELECT MIN(ID) FROM available)and SPEED<1  LIMIT 1;')
+        proxy = self.cursor.fetchone()
+        print(proxy)
+        request.meta['proxy'] = 'https://' + proxy[1] + ':' + str(proxy[2])
+    # def process_request(self, request, spider):
+    #     proxy = random.choice(PROXIES)
+    #     print(proxy)
+    #     request.meta['proxy'] = 'https://' + proxy
+                                # + proxy['host'] + ':' + str(proxy['port'])
